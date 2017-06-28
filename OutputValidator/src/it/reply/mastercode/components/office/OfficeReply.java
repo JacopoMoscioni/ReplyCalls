@@ -3,6 +3,7 @@ package it.reply.mastercode.components.office;
 import it.reply.mastercode.components.misc.Employee;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Jacopo Moscioni on 27/06/17.
@@ -10,9 +11,12 @@ import java.util.ArrayList;
 public class OfficeReply extends Office {
     private Integer numeroDipendenti;
     private ArrayList<Employee> dipendentiLista;
+    private HashMap<String,Employee> dipendentiMap;
 
     public OfficeReply(String name) {
         super(name);
+        dipendentiLista = new ArrayList<>();
+        dipendentiMap = new HashMap<>();
     }
 
     public Integer getNumeroDipendenti() {
@@ -27,7 +31,8 @@ public class OfficeReply extends Office {
         return dipendentiLista;
     }
 
-    public void setDipendentiLista(ArrayList<Employee> dipendentiLista) {
-        this.dipendentiLista = dipendentiLista;
+    public HashMap<String, Employee> getDipendentiMap() {
+        return dipendentiMap;
     }
+
 }

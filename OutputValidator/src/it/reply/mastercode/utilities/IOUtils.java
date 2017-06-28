@@ -15,7 +15,7 @@ import java.util.stream.Stream;
  * Created by Jacopo Moscioni on 27/06/17.
  */
 public class IOUtils {
-    public static List<String> readInputFile(final String filename) {
+    public static List<String> readFile(final String filename) {
         List<String> lines = new ArrayList<>();
         try(Stream<String> stream = Files.lines(Paths.get(filename))) {
             lines = stream.collect(Collectors.toList());
