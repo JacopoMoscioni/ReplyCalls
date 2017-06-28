@@ -1,14 +1,15 @@
-package it.reply.mastercode.components.common;
+package it.reply.mastercode.components.misc;
 
 /**
  * Created by Jacopo Moscioni on 27/06/17.
  */
 public class Points {
-    Integer software;
-    Integer hardware;
+    private Integer software;
+    private Integer hardware;
 
-    public Points(Integer software) {
+    public Points(Integer software, Integer hardware) {
         this.software = software;
+        this.hardware = hardware;
     }
 
     public Integer getSoftware() {
