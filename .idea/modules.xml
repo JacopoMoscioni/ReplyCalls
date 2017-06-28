@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/OutputValidator/OutputValidator.iml" filepath="$PROJECT_DIR$/OutputValidator/OutputValidator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ReplyCalls.iml" filepath="$PROJECT_DIR$/ReplyCalls.iml" />
+    </modules>
+  </component>
+</project>

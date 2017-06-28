@@ -1,0 +1,44 @@
+package it.reply.mastercode.utilities;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ * Created by Jacopo Moscioni on 27/06/17.
+ */
+public class IOUtils {
+    public static List<String> readInputFile(final String filename) {
+        List<String> lines = new ArrayList<>();
+
+        try(Stream<String> stream = Files.lines(Paths.get(filename))) {
+
+            lines = stream.collect(Collectors.toList());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return lines;
+    }
+
+
+    public static List<String> readFileHeader(final String filename) {
+        List<String> header = new ArrayList<>();
+
+        try (Stream<String> stream = Files.lines(Paths.get(filename))) {
+
+            header = stream.findFirst().map(l -> Arrays.asList(l.split(" "))).get();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return header;
+    }
+}
