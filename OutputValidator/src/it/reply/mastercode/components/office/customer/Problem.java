@@ -1,6 +1,6 @@
-package it.reply.mastercode.components.misc;
+package it.reply.mastercode.components.office.customer;
 
-import it.reply.mastercode.components.office.OfficeCustomer;
+import it.reply.mastercode.components.office.common.Points;
 
 /**
  * Created by Jacopo Moscioni on 27/06/17.
@@ -10,12 +10,14 @@ public class Problem {
     private Integer expectedCost;
     private Integer workingDaysLeft;
     private OfficeCustomer customer;
+    private String name;
 
-    public Problem(Points difficulty, Integer expectedCost, Integer workingDaysLeft, OfficeCustomer customer) {
+    public Problem(Points difficulty, Integer expectedCost, Integer workingDaysLeft, OfficeCustomer customer, String name) {
         this.difficulty = difficulty;
         this.expectedCost = expectedCost;
         this.workingDaysLeft = workingDaysLeft;
         this.customer = customer;
+        this.name = name;
     }
 
     public Points getDifficulty() {
@@ -32,5 +34,9 @@ public class Problem {
 
     public OfficeCustomer getCustomer() {
         return customer;
+    }
+
+    public String getName() {
+        return name;
     }
 }

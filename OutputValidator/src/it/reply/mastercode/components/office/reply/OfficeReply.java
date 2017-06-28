@@ -1,6 +1,7 @@
-package it.reply.mastercode.components.office;
+package it.reply.mastercode.components.office.reply;
 
-import it.reply.mastercode.components.misc.Employee;
+import it.reply.mastercode.components.office.Office;
+import it.reply.mastercode.components.office.reply.team.Employee;
 
 import java.util.ArrayList;
 import java.util.HashMap;

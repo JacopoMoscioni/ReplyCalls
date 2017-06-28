@@ -1,6 +1,7 @@
-package it.reply.mastercode.components.misc;
+package it.reply.mastercode.components.office.reply.team;
 
-import it.reply.mastercode.components.office.OfficeReply;
+import it.reply.mastercode.components.office.common.Points;
+import it.reply.mastercode.components.office.reply.OfficeReply;
 
 /**
  * Created by Jacopo Moscioni on 27/06/17.

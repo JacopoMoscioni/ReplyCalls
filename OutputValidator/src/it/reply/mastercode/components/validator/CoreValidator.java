@@ -1,16 +1,16 @@
 package it.reply.mastercode.components.validator;
 
-import it.reply.mastercode.components.graph.GraphEdge;
-import it.reply.mastercode.components.graph.GraphWeight;
-import it.reply.mastercode.components.misc.Employee;
-import it.reply.mastercode.components.misc.Points;
-import it.reply.mastercode.components.misc.Problem;
-import it.reply.mastercode.components.misc.Team;
-import it.reply.mastercode.components.misc.TeamMember;
-import it.reply.mastercode.components.office.OfficeCustomer;
-import it.reply.mastercode.components.office.OfficeReply;
-import it.reply.mastercode.utilities.Constants;
-import it.reply.mastercode.utilities.IOUtils;
+import it.reply.mastercode.components.office.graph.GraphEdge;
+import it.reply.mastercode.components.office.graph.GraphWeight;
+import it.reply.mastercode.components.office.reply.team.Employee;
+import it.reply.mastercode.components.office.common.Points;
+import it.reply.mastercode.components.office.customer.Problem;
+import it.reply.mastercode.components.office.reply.team.Team;
+import it.reply.mastercode.components.office.reply.team.TeamMember;
+import it.reply.mastercode.components.office.customer.OfficeCustomer;
+import it.reply.mastercode.components.office.reply.OfficeReply;
+import it.reply.mastercode.components.misc.Constants;
+import it.reply.mastercode.components.misc.IOUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,11 +25,9 @@ public class CoreValidator {
     private int replyNumber;
     private int problemsNumber;
 
-    private List<Team> teamList = new ArrayList<>();
-    private List<Problem> problemList = new ArrayList<>();
-    private List<GraphEdge> edgeList = new ArrayList<>();
-    //private List<OfficeReply> orList = new ArrayList<>();
-
+    private Map<String,Team> tMap = new HashMap<>();
+    private Map<String,GraphEdge> eMap = new HashMap<>();
+    private Map<String,Problem> pMap = new HashMap<>();
     private Map<String,OfficeReply> orMap = new HashMap<>();
     private Map<String,OfficeCustomer> ocMap = new HashMap<>();
 
@@ -40,11 +38,11 @@ public class CoreValidator {
     }
 
     private CoreValidator() {
-        parseInputFile();
-        parseOutputFile();
+        if (parseInputFile() && parseOutputFile())
+            performScore();
     }
 
-    private void parseInputFile(){
+    private boolean parseInputFile(){
         int lineCounter = 0;
 
         //List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_MAC);
@@ -59,7 +57,7 @@ public class CoreValidator {
         }
         else {
             System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: "+(lineCounter-1));
-            return;
+            return false;
         }
 
         //READING EDGES
@@ -90,10 +88,10 @@ public class CoreValidator {
                         oc = tempc;
                     }
                     GraphEdge edge = new GraphEdge(gw,or,oc);
-                    edgeList.add(edge);
+                    eMap.put(edge.getName(),edge);
                 } else {
                     System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
-                    return;
+                    return false;
                 }
             }
         }
@@ -102,7 +100,7 @@ public class CoreValidator {
         //READING REPLY OFFICE DESCRIPTION
         if (orMap.size() != replyNumber){
             System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED. REPLY OFFICES COUNT IS NOT VALID");
-            return;
+            return false;
         }
 
         for (int R = 0; R < replyNumber; R++){
@@ -113,7 +111,7 @@ public class CoreValidator {
             }
             else {
                 System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
-                return;
+                return false;
             }
             //READING EMPLOYEES
             if (or.getNumeroDipendenti() > 0){
@@ -129,7 +127,7 @@ public class CoreValidator {
                     }
                     else{
                         System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
-                        return;
+                        return false;
                     }
                 }
                 //or.setDipendentiLista(employeeList);
@@ -138,7 +136,7 @@ public class CoreValidator {
             }
             else{
                 System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
-                return;
+                return false;
             }
             //FINISH EMPLOYEES
         }
@@ -158,62 +156,69 @@ public class CoreValidator {
                 Integer expectedCost = Integer.parseInt(problemLine[3]);
                 Integer customerSource = Integer.parseInt(problemLine[4]) - 1;
                 Points pt = new Points(softwareSkill,hardwareSkill);
-                Problem problem = new Problem(pt, timeLeft, expectedCost, ocMap.get(Constants.PREFIX_CUSTOMER + customerSource));
-                problemList.add(problem);
+
+                Problem problem = new Problem(pt, timeLeft, expectedCost, ocMap.get(Constants.PREFIX_CUSTOMER + customerSource), Constants.PREFIX_PROBLEM + p);
+                //problemList.add(problem);
+                pMap.put(problem.getName(),problem);
             }
             else{
                 System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
-                return;
+                return false;
             }
         }
 
         //FINISH PROBLEMS
 
-        edgeList.get(0);
-
+        // eMap.get(0);
+        return true;
     }
 
-    private void parseOutputFile(){
+    private boolean parseOutputFile() {
         int lineCounter = 0;
 
         //List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_JACOPO_MAC);
         List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_JACOPO_WINDOWS);
         int numeroProblemi = output.size();
-        if (numeroProblemi != problemList.size()){
+        if (numeroProblemi != pMap.size()) {
             System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED NOT OK. OUTPUT PROBLEMS NUMBER DOES NOT MATCH THE INPUT PROBLEMS NUMBER");
-            return;
-        }
-        else{
-            for (int p = 0; p < numeroProblemi; p++){
+            return false;
+        } else {
+            for (int p = 0; p < numeroProblemi; p++) {
                 String[] teamDescriptor = output.get(lineCounter++).split(Constants.SEPARATOR_SPACE);
-                Team team = new Team(new ArrayList<>());
-                for (int t = 0; t < teamDescriptor.length; t++){
-                    String[] employeeDescriptor = teamDescriptor[t].split(Constants.SEPARATOR_DOT);
-                    if (employeeDescriptor.length == 2){
-                        Integer ReplyOffice = Integer.parseInt(employeeDescriptor[0]) - 1;
-                        Integer employeeNumber = Integer.parseInt(employeeDescriptor[1]) - 1;
-                        if (ReplyOffice >= 0 && employeeNumber >= 0){
-                            OfficeReply R = orMap.get(Constants.PREFIX_REPLY + ReplyOffice);
-                            Employee e = R.getDipendentiMap().get(Constants.PREFIX_EMPLOYEE + employeeNumber);
-                            TeamMember tm = new TeamMember(e,R);
-                            team.getTeamList().add(tm);
-                        }
-                        else{
-                            System.out.println("ERROR OCCURRED. reply offices and/or employee number cannot be 0");
-                            return;
-                        }
-                        teamList.add(team);
-                    }
-                    else{
-                        System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
-                        return;
-                    }
-
+                Problem problem = pMap.get(Constants.PREFIX_PROBLEM + p);
+                if (problem == null) {
+                    System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED NOT OK.PROBLEM INDEX IS NOT VALID");
+                    return false;
                 }
 
+                Team team = new Team(new ArrayList<>(), problem);
+                for (int t = 0; t < teamDescriptor.length; t++) {
+                    String[] employeeDescriptor = teamDescriptor[t].split(Constants.SEPARATOR_DOT);
+                    if (employeeDescriptor.length == 2) {
+                        Integer ReplyOffice = Integer.parseInt(employeeDescriptor[0]) - 1;
+                        Integer employeeNumber = Integer.parseInt(employeeDescriptor[1]) - 1;
+                        if (ReplyOffice >= 0 && employeeNumber >= 0) {
+                            OfficeReply officeReply = orMap.get(Constants.PREFIX_REPLY + ReplyOffice);
+                            Employee employee = officeReply.getDipendentiMap().get(Constants.PREFIX_EMPLOYEE + employeeNumber);
+                            GraphEdge edge = eMap.get(officeReply.getName() + problem.getCustomer().getName());
+                            TeamMember tm = new TeamMember(employee, officeReply, edge);
+                            team.getTeamList().add(tm);
+                            team.setName(Constants.PREFIX_TEAM + t);
+                        } else {
+                            System.out.println("ERROR OCCURRED. reply offices and/or employee number cannot be 0");
+                            return false;
+                        }
+                    } else {
+                        System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                        return false;
+                    }
+                }
+                tMap.put(team.getName(),team);
             }
-            System.out.println("woooo");
+            return true;
         }
+    }
+    private void performScore(){
 
     }
 }

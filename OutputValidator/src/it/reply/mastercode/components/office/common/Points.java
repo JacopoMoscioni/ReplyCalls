@@ -1,4 +1,4 @@
-package it.reply.mastercode.components.misc;
+package it.reply.mastercode.components.office.common;
 
 /**
  * Created by Jacopo Moscioni on 27/06/17.

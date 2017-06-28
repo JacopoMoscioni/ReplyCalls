@@ -1,4 +1,4 @@
-package it.reply.mastercode.utilities;
+package it.reply.mastercode.components.misc;
 
 /**
  * Created by Jacopo Moscioni on 28/06/17.
@@ -13,6 +13,8 @@ public class Constants {
     public final static String PREFIX_REPLY = "R";
     public final static String PREFIX_CUSTOMER ="c";
     public final static String PREFIX_EMPLOYEE = "e";
+    public final static String PREFIX_PROBLEM = "p";
+    public final static String PREFIX_TEAM = "t";
 
     public final static String SEPARATOR_SPACE = " ";
     public final static String SEPARATOR_DOT = "\\.";

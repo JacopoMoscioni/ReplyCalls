@@ -1,4 +1,4 @@
-package it.reply.mastercode.components.graph;
+package it.reply.mastercode.components.office.graph;
 
 /**
  * Created by Jacopo Moscioni on 27/06/17.
