@@ -8,16 +8,16 @@ import java.util.List;
  * Created by Jacopo Moscioni on 28/06/17.
  */
 public class Team {
-    private List<TeamMember> teamList;
+    private List<TeamMember> teamMemberList;
     private Problem problem;
     private String name;
-    public Team(List<TeamMember> teamList, Problem problem) {
-        this.teamList = teamList;
+    public Team(List<TeamMember> teamMemberList, Problem problem) {
+        this.teamMemberList = teamMemberList;
         this.problem = problem;
     }
 
-    public List<TeamMember> getTeamList() {
-        return teamList;
+    public List<TeamMember> getTeamMemberList() {
+        return teamMemberList;
     }
 
     public Problem getProblem() {

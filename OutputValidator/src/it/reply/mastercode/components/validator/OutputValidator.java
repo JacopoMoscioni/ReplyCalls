@@ -20,12 +20,13 @@ import java.util.Map;
 /**
  * Created by Jacopo Moscioni on 27/06/17.
  */
-public class CoreValidator {
+public class OutputValidator {
     private int customersNumber;
     private int replyNumber;
     private int problemsNumber;
 
-    private Map<String,Team> tMap = new HashMap<>();
+    //private Map<String,Team> tMap = new HashMap<>();
+    private List<Team> tList = new ArrayList<>();
     private Map<String,GraphEdge> eMap = new HashMap<>();
     private Map<String,Problem> pMap = new HashMap<>();
     private Map<String,OfficeReply> orMap = new HashMap<>();
@@ -33,20 +34,25 @@ public class CoreValidator {
 
     public static void main(String [] args){
         System.out.println("inizio");
-        new CoreValidator();
+        new OutputValidator();
         System.out.println("fine");
     }
 
-    private CoreValidator() {
+    private OutputValidator() {
+        Float points = new Float(Float.MAX_VALUE);
         if (parseInputFile() && parseOutputFile())
-            performScore();
+            points = performScore();
+        System.out.println("your score is: " + points);
     }
 
     private boolean parseInputFile(){
         int lineCounter = 0;
 
+        ClassLoader classLoader = getClass().getClassLoader();
         //List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_MAC);
         List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_WINDOWS);
+
+        //List<String> input = IOUtils.readFile( classLoader.getResource("input.txt").getFile().replace("/","\\\\").replace("\\\\C:","C:"));
 
 
         String [] header = input.get(lineCounter++).split(Constants.SEPARATOR_SPACE);
@@ -202,7 +208,7 @@ public class CoreValidator {
                             Employee employee = officeReply.getDipendentiMap().get(Constants.PREFIX_EMPLOYEE + employeeNumber);
                             GraphEdge edge = eMap.get(officeReply.getName() + problem.getCustomer().getName());
                             TeamMember tm = new TeamMember(employee, officeReply, edge);
-                            team.getTeamList().add(tm);
+                            team.getTeamMemberList().add(tm);
                             team.setName(Constants.PREFIX_TEAM + t);
                         } else {
                             System.out.println("ERROR OCCURRED. reply offices and/or employee number cannot be 0");
@@ -213,12 +219,39 @@ public class CoreValidator {
                         return false;
                     }
                 }
-                tMap.put(team.getName(),team);
+                //tMap.put(team.getName(),team);
+                tList.add(team);
             }
             return true;
         }
     }
-    private void performScore(){
 
+    /**
+     * TODO:
+     * @return
+     */
+    private Float performScore(){
+        System.out.println("********************************** performScore() function needs to be implemented ****************************");
+
+        /*
+        here we can use:
+         - tList the team list
+         - eMap the employee map
+         - pMap the problem map
+         - orMap the office reply map
+         - ocMap the office customer map
+         */
+//
+//        for(Team team: tList){
+//            for (TeamMember teamMember: team.getTeamMemberList()) {
+//                GraphEdge e = eMap.get(teamMember.getReply().getName() + team.getProblem().getCustomer().getName());
+//                int i = e.getWeight().getDailyInterruptions();
+//                float s = (100 - i) / 100 * team.getProblem().getDifficulty().getSoftware();
+//                float h = (100 - i) / 100 * team.getProblem().getDifficulty().getHardware();
+//
+//                Float tetaP = team.getProblem().getDifficulty().getSoftware()
+//            }
+//        }
+        return new Float(Float.MIN_VALUE);
     }
 }
