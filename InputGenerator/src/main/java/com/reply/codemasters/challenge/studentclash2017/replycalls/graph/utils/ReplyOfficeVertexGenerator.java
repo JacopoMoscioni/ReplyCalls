@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 public class ReplyOfficeVertexGenerator implements VertexFactory<ReplyOffice> {
     private final int maxEmployeeNum;
-    private final Stream<Employee> employeeStream;
+    private final EmployeeGenerator employeeGenerator;
 
     private final AtomicInteger officeCounter = new AtomicInteger(1);
 
@@ -21,16 +21,16 @@ public class ReplyOfficeVertexGenerator implements VertexFactory<ReplyOffice> {
                                       int minHardwareSkillPoints, int maxHardwareSkillPoints, int[] fees) {
 
         this.maxEmployeeNum = maxEmployeeNum;
-        this.employeeStream = Stream.generate(
+        this.employeeGenerator =
                 new EmployeeGenerator(minSoftwareSkillPoints, maxSoftwareSkillPoints, minHardwareSkillPoints,
-                                      maxHardwareSkillPoints, fees));
+                                      maxHardwareSkillPoints, fees);
     }
 
     @Override
     public ReplyOffice createVertex() {
         return new ReplyOffice(officeCounter.getAndIncrement(),
-                               employeeStream
-                                       .limit(ThreadLocalRandom.current().nextInt(1, maxEmployeeNum))
-                                       .toArray(Employee[]::new));
+                               Stream.generate(employeeGenerator)
+                                     .limit(ThreadLocalRandom.current().nextInt(1, maxEmployeeNum))
+                                     .toArray(Employee[]::new));
     }
 }

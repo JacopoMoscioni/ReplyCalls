@@ -12,7 +12,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="input-generator" target="1.5" />
+      <module name="input-generator" target="1.8" />
       <module name="InputGenerator" target="1.5" />
     </bytecodeTargetLevel>
   </component>

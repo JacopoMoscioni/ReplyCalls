@@ -42,7 +42,6 @@ public class CommandLineOptions {
         commandLineOptions.addRequiredOption("" + PROBLEMS, "problems", true,
                                              "The number of problems to generate");
 
-        commandLineOptions.addOption("" + PROBLEMS, "problems", true, "The number of problems to generate");
         commandLineOptions.addOption("" + EMPLOYEES, "employee", true, "Maximum number of employee for each company");
 
         // Employees
