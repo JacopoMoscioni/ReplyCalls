@@ -1,20 +1,22 @@
 package com.reply.codemasters.challenge.studentclash2017.replycalls;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Streams;
+import com.google.common.base.Predicates;
+import com.reply.codemasters.challenge.studentclash2017.replycalls.generators.ProblemGenerator;
 import com.reply.codemasters.challenge.studentclash2017.replycalls.graph.utils.BipartiteVertexFactory;
 import com.reply.codemasters.challenge.studentclash2017.replycalls.graph.utils.CustomerOfficeVertexGenerator;
 import com.reply.codemasters.challenge.studentclash2017.replycalls.graph.utils.OfficeConnectionEdgeGenerator;
 import com.reply.codemasters.challenge.studentclash2017.replycalls.graph.utils.ReplyOfficeVertexGenerator;
-import com.reply.codemasters.challenge.studentclash2017.replycalls.model.Office;
-import com.reply.codemasters.challenge.studentclash2017.replycalls.model.OfficeConnection;
+import com.reply.codemasters.challenge.studentclash2017.replycalls.model.*;
 import com.reply.codemasters.challenge.studentclash2017.replycalls.options.CommandLineOptions;
+import com.reply.codemasters.challenge.studentclash2017.replycalls.options.Parameters;
 import org.apache.commons.cli.*;
 import org.jgrapht.Graph;
 import org.jgrapht.generate.GnpRandomBipartiteGraphGenerator;
 import org.jgrapht.graph.SimpleGraph;
 
-import static com.reply.codemasters.challenge.studentclash2017.replycalls.options.CommandLineOptions.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Main program for the input generator.
@@ -26,11 +28,19 @@ public class Main {
         final CommandLineParser parser = new DefaultParser();
 
         try {
-            final CommandLine commandLine = parser.parse(commandLineOptions, argv);
-
+            final Parameters commandLine = new Parameters(parser.parse(commandLineOptions, argv));
 
             final Graph<Office, OfficeConnection> officeGraph = generateOfficesGraph(commandLine);
 
+            final Stream<Problem> problems =
+                    generateProblems(officeGraph.vertexSet()
+                                                .stream()
+                                                .filter(Predicates.instanceOf(CustomerOffice.class))
+                                                .map(CustomerOffice.class::cast)
+                                                .collect(Collectors.toList()),
+                                     commandLine);
+
+            printProblemStatement(officeGraph, problems, commandLine);
         } catch (ParseException e) {
             System.err.println(e.getLocalizedMessage());
             new HelpFormatter().printHelp("java -jar <jarfile>", commandLineOptions);
@@ -38,86 +48,77 @@ public class Main {
         }
     }
 
-    private static Graph<Office, OfficeConnection> generateOfficesGraph(CommandLine commandLine) {
-        final int replyOfficesNum = getIntInRange(commandLine.getOptionValue(REPLY_OFFICES), 0, 1000);
-        final int customersOfficesNum = getIntInRange(commandLine.getOptionValue(
-                CUSTOMER_OFFICES), 0, 1000);
-        final double connectionDensity = getDoubleInRange(commandLine.getOptionValue(CONNECTION_DENSITY), 0d, 1d);
+    private static void printProblemStatement(Graph<Office, OfficeConnection> officeGraph,
+                                              Stream<Problem> problems,
+                                              Parameters commandLine) {
+        // print first line
+        System.out.printf("%d %d %d\n", commandLine.getReplyOfficesNum(), commandLine.getCustomersOfficesNum(),
+                          commandLine.getProblems());
 
-        // parameters for Reply offices generation
-        final int maxEmployeeNum = getIntInRange(commandLine.getOptionValue(EMPLOYEES, "100"), 0, 1000);
+        // print connections information
+        for (OfficeConnection officeConnection : officeGraph.edgeSet()) {
+            System.out.printf("%d %d %d %d\n",
+                              officeConnection.getReplyOffice().getId(),
+                              officeConnection.getCustomerOffice().getId(),
+                              officeConnection.getNetworkHiccups(),
+                              officeConnection.getConcurrentConnections());
+        }
 
-        final int minSoftwareSkillPoints =
-                getIntInRange(commandLine.getOptionValue(MIN_SOFTWARE_POINTS, "100"), 0, 1000);
-        final int maxSoftwareSkillPoints =
-                getIntInRange(commandLine.getOptionValue(MAX_SOFTWARE_POINTS, "1000"), minSoftwareSkillPoints, 1000);
+        // print Reply offices data
+        officeGraph.vertexSet().stream()
+                   .filter(Predicates.instanceOf(ReplyOffice.class))
+                   .map(ReplyOffice.class::cast)
+                   .forEach((replyOffice -> {
+                       System.out.println(replyOffice.getEmployees().length);
+                       for (final Employee employee : replyOffice.getEmployees()) {
+                           System.out.printf("%d %d %d\n",
+                                             employee.getSoftwareSkills(),
+                                             employee.getHardwareSkills(),
+                                             employee.getFee());
+                       }
+                   }));
 
-        final int minHardwareSkillPoints =
-                getIntInRange(commandLine.getOptionValue(MIN_SOFTWARE_POINTS, "100"), 0, 1000);
-        final int maxHardwareSkillPoints =
-                getIntInRange(commandLine.getOptionValue(MAX_SOFTWARE_POINTS, "1000"), minHardwareSkillPoints, 1000);
+        // print problems
+        problems.forEach((problem -> System.out.printf("%d %d %d %d %d\n",
+                                                   problem.getSoftwareSkills(),
+                                                   problem.getHardwareSkills(),
+                                                   problem.getEstimatedEffort(),
+                                                   problem.getBudget(),
+                                                   problem.getIssuer().getId())));
+    }
 
-        final int[] fees = getIntArrayInRange(commandLine.getOptionValue(FEES, "100,250,500,750,1000"), 0, 1000);
+    private static Stream<Problem> generateProblems(List<CustomerOffice> customers, Parameters commandLine) {
+        return Stream.generate(new ProblemGenerator(customers, commandLine.getMinProblemSoftwareSkill(),
+                                                    commandLine.getMaxProblemSoftwareSkill(),
+                                                    commandLine.getMinProblemHardwareSkill(),
+                                                    commandLine.getMaxProblemHardwareSkill(),
+                                                    commandLine.getMinProblemBudget(),
+                                                    commandLine.getMaxProblemBudget(),
+                                                    commandLine.getMinProblemEffort(),
+                                                    commandLine.getMaxProblemEffort()))
+                     .limit(commandLine.getProblems());
+    }
 
-        // parameters for Reply-Customer connections generation
-        final int minHiccups = getIntInRange(commandLine.getOptionValue(MIN_CONNECTION_HICCUPS, "0"), 0, 100);
-        final int maxHiccups =
-                getIntInRange(commandLine.getOptionValue(MAX_CONNECTION_HICCUPS, "100"), minHiccups, 100);
-        final int minConnections = getIntInRange(commandLine.getOptionValue(MIN_CONCURRENT_CONNECTIONS, "0"), 0, 100);
-        final int maxConnections =
-                getIntInRange(commandLine.getOptionValue(MAX_CONCURRENT_CONNECTIONS, "100"), minConnections, 100);
-
+    private static Graph<Office, OfficeConnection> generateOfficesGraph(Parameters commandLine) {
         final GnpRandomBipartiteGraphGenerator<Office, OfficeConnection> graphGenerator =
-                new GnpRandomBipartiteGraphGenerator<>(replyOfficesNum,
-                                                       customersOfficesNum,
-                                                       connectionDensity);
+                new GnpRandomBipartiteGraphGenerator<>(commandLine.getReplyOfficesNum(),
+                                                       commandLine.getCustomersOfficesNum(),
+                                                       commandLine.getConnectionDensity());
         final Graph<Office, OfficeConnection> officeGraph = new SimpleGraph<>(
-                new OfficeConnectionEdgeGenerator(minHiccups, maxHiccups, minConnections, maxConnections));
+                new OfficeConnectionEdgeGenerator(commandLine.getMinHiccups(), commandLine.getMaxHiccups(),
+                                                  commandLine.getMinConnections(), commandLine.getMaxConnections()));
         graphGenerator.generateGraph(officeGraph,
-                                     new BipartiteVertexFactory(new ReplyOfficeVertexGenerator(maxEmployeeNum,
-                                                                                               minSoftwareSkillPoints,
-                                                                                               maxSoftwareSkillPoints,
-                                                                                               minHardwareSkillPoints,
-                                                                                               maxHardwareSkillPoints,
-                                                                                               fees),
-                                                                new CustomerOfficeVertexGenerator(),
-                                                                replyOfficesNum),
+                                     new BipartiteVertexFactory(
+                                             new ReplyOfficeVertexGenerator(commandLine.getMaxEmployeeNum(),
+                                                                            commandLine.getMinSoftwareSkillPoints(),
+                                                                            commandLine.getMaxSoftwareSkillPoints(),
+                                                                            commandLine.getMinHardwareSkillPoints(),
+                                                                            commandLine.getMaxHardwareSkillPoints(),
+                                                                            commandLine.getFees()),
+                                             new CustomerOfficeVertexGenerator(),
+                                             commandLine.getReplyOfficesNum()),
                                      null);
         return officeGraph;
     }
 
-    private static int[] getIntArrayInRange(String value, int minimum, int maximum) {
-        final int[] ints = Streams.stream(Splitter.on(',').omitEmptyStrings().trimResults().split(value))
-                                  .mapToInt(Integer::parseInt)
-                                  .toArray();
-
-        for (int current : ints) {
-            if (current < minimum || current > maximum) {
-                throw new IllegalArgumentException(
-                        "Value " + value + " outside validity range [" + minimum + ", " + maximum + "]");
-            }
-        }
-
-        return ints;
-    }
-
-    private static double getDoubleInRange(String value, double minimum, double maximum) {
-        double val = Double.parseDouble(value);
-        if (val < minimum || val > maximum) {
-            throw new IllegalArgumentException(
-                    "Value " + value + " outside validity range [" + minimum + ", " + maximum + "]");
-        }
-
-        return val;
-    }
-
-    private static int getIntInRange(String value, int minimum, int maximum) {
-        int val = Integer.parseInt(value);
-        if (val < minimum || val > maximum) {
-            throw new IllegalArgumentException(
-                    "Value " + value + " outside validity range [" + minimum + ", " + maximum + "]");
-        }
-
-        return val;
-    }
 }

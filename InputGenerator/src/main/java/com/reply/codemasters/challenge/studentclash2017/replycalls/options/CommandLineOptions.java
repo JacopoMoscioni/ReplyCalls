@@ -39,6 +39,8 @@ public class CommandLineOptions {
                                              true,
                                              "The higher this number, the more connections there will be between " +
                                                      "Reply and Customer offices");
+        commandLineOptions.addRequiredOption("" + PROBLEMS, "problems", true,
+                                             "The number of problems to generate");
 
         commandLineOptions.addOption("" + PROBLEMS, "problems", true, "The number of problems to generate");
         commandLineOptions.addOption("" + EMPLOYEES, "employee", true, "Maximum number of employee for each company");
