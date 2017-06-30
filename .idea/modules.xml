@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/InputGenerator/InputGenerator.iml" filepath="$PROJECT_DIR$/InputGenerator/InputGenerator.iml" />
       <module fileurl="file://$PROJECT_DIR$/OutputValidator/OutputValidator.iml" filepath="$PROJECT_DIR$/OutputValidator/OutputValidator.iml" />
       <module fileurl="file://$PROJECT_DIR$/ReplyCalls.iml" filepath="$PROJECT_DIR$/ReplyCalls.iml" />
     </modules>
