@@ -6,7 +6,21 @@ import com.reply.codemasters.challenge.studentclash2017.replycalls.model.OfficeC
 import com.reply.codemasters.challenge.studentclash2017.replycalls.model.ReplyOffice;
 import org.jgrapht.EdgeFactory;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class OfficeConnectionEdgeGenerator implements EdgeFactory<Office, OfficeConnection> {
+    private final int minHiccups;
+    private final int maxHiccups;
+    private final int minConnections;
+    private final int maxConnections;
+
+    public OfficeConnectionEdgeGenerator(int minHiccups, int maxHiccups, int minConnections, int maxConnections) {
+        this.minHiccups = minHiccups;
+        this.maxHiccups = maxHiccups;
+        this.minConnections = minConnections;
+        this.maxConnections = maxConnections;
+    }
+
     @Override
     public OfficeConnection createEdge(Office first, Office second) {
         final ReplyOffice replyOffice = (ReplyOffice) (first instanceof ReplyOffice ? first : second);
@@ -16,6 +30,9 @@ public class OfficeConnectionEdgeGenerator implements EdgeFactory<Office, Office
          * thrown exception.
          */
 
-        return new OfficeConnection(replyOffice, customerOffice);
+        final int hiccups = ThreadLocalRandom.current().nextInt(minHiccups, maxHiccups);
+        final int concurrentConnections = ThreadLocalRandom.current().nextInt(minConnections, maxConnections);
+
+        return new OfficeConnection(replyOffice, customerOffice, hiccups, concurrentConnections);
     }
 }
