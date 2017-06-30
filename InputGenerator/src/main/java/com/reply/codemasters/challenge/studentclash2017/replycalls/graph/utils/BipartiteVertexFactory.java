@@ -4,9 +4,6 @@ import com.reply.codemasters.challenge.studentclash2017.replycalls.model.Office;
 import lombok.RequiredArgsConstructor;
 import org.jgrapht.VertexFactory;
 
-/**
- * Created by L210282 on 30/06/2017.
- */
 @RequiredArgsConstructor
 public class BipartiteVertexFactory implements VertexFactory<Office> {
 

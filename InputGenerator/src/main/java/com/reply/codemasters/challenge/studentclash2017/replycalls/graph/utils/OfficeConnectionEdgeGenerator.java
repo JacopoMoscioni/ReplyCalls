@@ -6,9 +6,6 @@ import com.reply.codemasters.challenge.studentclash2017.replycalls.model.OfficeC
 import com.reply.codemasters.challenge.studentclash2017.replycalls.model.ReplyOffice;
 import org.jgrapht.EdgeFactory;
 
-/**
- * Created by L210282 on 30/06/2017.
- */
 public class OfficeConnectionEdgeGenerator implements EdgeFactory<Office, OfficeConnection> {
     @Override
     public OfficeConnection createEdge(Office first, Office second) {
