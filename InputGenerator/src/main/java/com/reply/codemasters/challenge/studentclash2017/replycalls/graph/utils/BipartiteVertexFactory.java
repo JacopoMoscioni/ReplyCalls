@@ -4,6 +4,8 @@ import com.reply.codemasters.challenge.studentclash2017.replycalls.model.Office;
 import lombok.RequiredArgsConstructor;
 import org.jgrapht.VertexFactory;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @RequiredArgsConstructor
 public class BipartiteVertexFactory implements VertexFactory<Office> {
 
@@ -13,11 +15,11 @@ public class BipartiteVertexFactory implements VertexFactory<Office> {
 
     private final int numberOfFirst;
 
-    private int generated = 0;
+    private final AtomicInteger generated = new AtomicInteger(0);
 
     @Override
     public Office createVertex() {
-        return this.generated++ < numberOfFirst
+        return this.generated.getAndIncrement() < numberOfFirst
                 ? firstPartitionFactory.createVertex()
                 : secondPartitionFactory.createVertex();
     }

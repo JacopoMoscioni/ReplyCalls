@@ -7,10 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="input-generator" />
         <module name="InputGenerator" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="input-generator" target="1.5" />
       <module name="InputGenerator" target="1.5" />
     </bytecodeTargetLevel>
   </component>
