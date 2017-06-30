@@ -52,7 +52,7 @@ public class Main {
                                               Stream<Problem> problems,
                                               Parameters commandLine) {
         // print first line
-        System.out.printf("%d %d %d\n", commandLine.getReplyOfficesNum(), commandLine.getCustomersOfficesNum(),
+        System.out.printf("%d %d %d\n", commandLine.getReplyOfficesNum(), officeGraph.edgeSet().size(),
                           commandLine.getProblems());
 
         // print connections information
@@ -80,11 +80,11 @@ public class Main {
 
         // print problems
         problems.forEach((problem -> System.out.printf("%d %d %d %d %d\n",
-                                                   problem.getSoftwareSkills(),
-                                                   problem.getHardwareSkills(),
-                                                   problem.getEstimatedEffort(),
-                                                   problem.getBudget(),
-                                                   problem.getIssuer().getId())));
+                                                       problem.getSoftwareSkills(),
+                                                       problem.getHardwareSkills(),
+                                                       problem.getEstimatedEffort(),
+                                                       problem.getBudget(),
+                                                       problem.getIssuer().getId())));
     }
 
     private static Stream<Problem> generateProblems(List<CustomerOffice> customers, Parameters commandLine) {
