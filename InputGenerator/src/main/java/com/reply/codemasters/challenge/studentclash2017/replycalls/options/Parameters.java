@@ -34,13 +34,13 @@ public class Parameters {
     private final int maxProblemEffort;
 
     public Parameters(CommandLine commandLine) {
-        replyOfficesNum = getIntInRange(commandLine.getOptionValue(REPLY_OFFICES), 0, 1000);
+        replyOfficesNum = getIntInRange(commandLine.getOptionValue(REPLY_OFFICES), 1, 1_000);
         customersOfficesNum = getIntInRange(commandLine.getOptionValue(
-                CUSTOMER_OFFICES), 0, 1000);
+                CUSTOMER_OFFICES), 1, 1_000);
         connectionDensity = getDoubleInRange(commandLine.getOptionValue(CONNECTION_DENSITY), 0d, 1d);
 
         // parameters for Reply offices generation
-        maxEmployeeNum = getIntInRange(commandLine.getOptionValue(EMPLOYEES, "100"), 0, 1000);
+        maxEmployeeNum = getIntInRange(commandLine.getOptionValue(EMPLOYEES, "100"), 0, 1_000);
 
         minSoftwareSkillPoints = getIntInRange(commandLine.getOptionValue(MIN_SOFTWARE_POINTS, "100"), 0, 1000);
         maxSoftwareSkillPoints =
@@ -60,7 +60,7 @@ public class Parameters {
                 getIntInRange(commandLine.getOptionValue(MAX_CONCURRENT_CONNECTIONS, "100"), minConnections, 100);
 
         // parameters for problem generation
-        problems = getIntInRange(commandLine.getOptionValue(PROBLEMS, "100"), 10, 1000);
+        problems = getIntInRange(commandLine.getOptionValue(PROBLEMS, "100"), 10, 1_000);
         minProblemSoftwareSkill = getIntInRange(
                 commandLine.getOptionValue(MIN_PROBLEM_SOFTWARE_POINTS, String.valueOf(4 * minSoftwareSkillPoints)), 0,
                 10_000);
