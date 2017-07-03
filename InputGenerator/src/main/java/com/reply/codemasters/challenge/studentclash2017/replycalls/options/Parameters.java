@@ -37,7 +37,7 @@ public class Parameters {
         replyOfficesNum = getIntInRange(commandLine.getOptionValue(REPLY_OFFICES), 1, 1_000);
         customersOfficesNum = getIntInRange(commandLine.getOptionValue(
                 CUSTOMER_OFFICES), 1, 1_000);
-        connectionDensity = getDoubleInRange(commandLine.getOptionValue(CONNECTION_DENSITY), 0d, 1d);
+        connectionDensity = getDoubleInRange(commandLine.getOptionValue(CONNECTION_DENSITY, "1"), 0d, 1d);
 
         // parameters for Reply offices generation
         maxEmployeeNum = getIntInRange(commandLine.getOptionValue(EMPLOYEES, "100"), 0, 1_000);

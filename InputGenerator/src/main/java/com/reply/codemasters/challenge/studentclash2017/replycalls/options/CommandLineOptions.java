@@ -34,7 +34,7 @@ public class CommandLineOptions {
                                              "The number of Reply offices to generate");
         commandLineOptions.addRequiredOption("" + CUSTOMER_OFFICES, "customers", true,
                                              "The number of Customer offices to generate");
-        commandLineOptions.addRequiredOption("" + CONNECTION_DENSITY,
+        commandLineOptions.addOption("" + CONNECTION_DENSITY,
                                              "density",
                                              true,
                                              "The higher this number, the more connections there will be between " +
