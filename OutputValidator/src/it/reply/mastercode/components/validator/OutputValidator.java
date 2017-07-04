@@ -21,7 +21,8 @@ import java.util.Map;
  * Created by Jacopo Moscioni on 27/06/17.
  */
 public class OutputValidator {
-    private int customersNumber;
+    //private int customersNumber;
+    private int connectionsNumber;
     private int replyNumber;
     private int problemsNumber;
 
@@ -39,7 +40,7 @@ public class OutputValidator {
     }
 
     private OutputValidator() {
-        Float points = new Float(Float.MAX_VALUE);
+        Double points = new Double(Double.MAX_VALUE);
         if (parseInputFile() && parseOutputFile())
             points = performScore();
         System.out.println("your score is: " + points);
@@ -57,63 +58,27 @@ public class OutputValidator {
 
         String [] header = input.get(lineCounter++).split(Constants.SEPARATOR_SPACE);
         if (header.length == 3) {
-            customersNumber = Integer.parseInt(header[0]);
-            replyNumber = Integer.parseInt(header[1]);
+            replyNumber = Integer.parseInt(header[0]);
+            connectionsNumber = Integer.parseInt(header[1]);
             problemsNumber = Integer.parseInt(header[2]);
         }
         else {
             System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: "+(lineCounter-1));
             return false;
         }
-
-        //READING EDGES
-        for (int c = 0; c < customersNumber; c++){
-            for (int R = 0; R < replyNumber; R++) {
-                String[] edgeDescriptor = input.get(lineCounter++).split(Constants.SEPARATOR_SPACE);
-                if (edgeDescriptor.length == 2) {
-                    GraphWeight gw = new GraphWeight(Integer.parseInt(edgeDescriptor[0]), Integer.parseInt(edgeDescriptor[1]));
-                    OfficeReply tempR = orMap.get(Constants.PREFIX_REPLY + R);
-                    OfficeCustomer tempc = ocMap.get(Constants.PREFIX_CUSTOMER + c);
-                    OfficeReply or;
-                    OfficeCustomer oc;
-                    if (tempR == null) {
-                        OfficeReply newOne = new OfficeReply(Constants.PREFIX_REPLY + R);
-                        orMap.put(Constants.PREFIX_REPLY + R, newOne);
-                        or = newOne;
-                    }
-                    else {
-                        or = tempR;
-                    }
-
-                    if (tempc == null) {
-                        OfficeCustomer newOne = new OfficeCustomer(Constants.PREFIX_CUSTOMER + c);
-                        ocMap.put(Constants.PREFIX_CUSTOMER + c, newOne);
-                        oc = newOne;
-                    }
-                    else {
-                        oc = tempc;
-                    }
-                    GraphEdge edge = new GraphEdge(gw,or,oc);
-                    eMap.put(edge.getName(),edge);
-                } else {
-                    System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
-                    return false;
-                }
-            }
-        }
-        //FINISH EDGES
-
-        //READING REPLY OFFICE DESCRIPTION
-        if (orMap.size() != replyNumber){
-            System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED. REPLY OFFICES COUNT IS NOT VALID");
-            return false;
-        }
-
+//READING REPLY OFFICE DESCRIPTION
         for (int R = 0; R < replyNumber; R++){
             String[] employeeLine = input.get(lineCounter++).split(Constants.SEPARATOR_SPACE);
-            OfficeReply or = orMap.get(Constants.PREFIX_REPLY + R);
+            OfficeReply or;
             if (employeeLine.length == 1){
-                or.setNumeroDipendenti(Integer.parseInt(employeeLine[0]));
+                int numDip =Integer.parseInt(employeeLine[0]);
+                OfficeReply tempR = orMap.get(Constants.PREFIX_REPLY + R);
+
+                OfficeReply newOne = new OfficeReply(Constants.PREFIX_REPLY + R);
+                orMap.put(Constants.PREFIX_REPLY + R, newOne);
+                or = newOne;
+
+                or.setNumeroDipendenti(numDip);
             }
             else {
                 System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
@@ -148,6 +113,51 @@ public class OutputValidator {
         }
 
         //FINISH REPLY OFFICES
+
+        //READING EDGES
+        for (int conn = 0; conn < connectionsNumber; conn++){
+            String[] edgeDescriptor = input.get(lineCounter++).split(Constants.SEPARATOR_SPACE);
+            if (edgeDescriptor.length == 4) {
+                int w1 = Integer.parseInt(edgeDescriptor[0]);
+                int w2 = Integer.parseInt(edgeDescriptor[1]);
+                int R = Integer.parseInt(edgeDescriptor[2]) - 1;
+                int c = Integer.parseInt(edgeDescriptor[3]) - 1;
+                if (R < 0 || c < 0){
+                    System.out.println("ERROR OCCURRED. replyID or custId lower input not valid. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                    return false;
+                }
+                GraphWeight gw = new GraphWeight(w1, w2);
+                OfficeReply tempR = orMap.get(Constants.PREFIX_REPLY + R);
+                OfficeCustomer tempc = ocMap.get(Constants.PREFIX_CUSTOMER + c);
+                OfficeReply or;
+                OfficeCustomer oc;
+                if (tempR == null) {
+                    OfficeReply newOne = new OfficeReply(Constants.PREFIX_REPLY + R);
+                    orMap.put(Constants.PREFIX_REPLY + R, newOne);
+                    or = newOne;
+                }
+                else {
+                    or = tempR;
+                }
+
+                if (tempc == null) {
+                    OfficeCustomer newOne = new OfficeCustomer(Constants.PREFIX_CUSTOMER + c);
+                    ocMap.put(Constants.PREFIX_CUSTOMER + c, newOne);
+                    oc = newOne;
+                }
+                else {
+                    oc = tempc;
+                }
+                GraphEdge edge = new GraphEdge(gw,or,oc);
+                eMap.put(edge.getName(),edge);
+            }
+            else {
+                System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                return false;
+            }
+        }
+
+        //FINISH EDGES
 
         //READING PROBLEMS
 
@@ -230,7 +240,7 @@ public class OutputValidator {
      * TODO:
      * @return
      */
-    private Float performScore(){
+    private Double performScore(){
         System.out.println("********************************** performScore() function needs to be implemented ****************************");
 
         /*
@@ -241,17 +251,46 @@ public class OutputValidator {
          - orMap the office reply map
          - ocMap the office customer map
          */
-//
-//        for(Team team: tList){
-//            for (TeamMember teamMember: team.getTeamMemberList()) {
-//                GraphEdge e = eMap.get(teamMember.getReply().getName() + team.getProblem().getCustomer().getName());
-//                int i = e.getWeight().getDailyInterruptions();
-//                float s = (100 - i) / 100 * team.getProblem().getDifficulty().getSoftware();
-//                float h = (100 - i) / 100 * team.getProblem().getDifficulty().getHardware();
-//
-//                Float tetaP = team.getProblem().getDifficulty().getSoftware()
-//            }
-//        }
-        return new Float(Float.MIN_VALUE);
+        double overall_I_p = 0;
+        for(Team team: tList){
+            double s_T = 0;
+            double h_T = 0;
+            double m_T = 0;
+            Problem problem = team.getProblem();
+            for (TeamMember teamMember: team.getTeamMemberList()) {
+                Employee employee = teamMember.getEmployee();
+                GraphEdge e = eMap.get(teamMember.getReply().getName() + problem.getCustomer().getName());
+                int i = e.getWeight().getDailyInterruptions();
+                double s = ((100.0 - i) / 100.0) * employee.getSkills().getSoftware();
+                double h = ((100.0 - i) / 100.0) * employee.getSkills().getHardware();
+                m_T += employee.getMoney();
+                s_T += s;
+                h_T += h;
+            }
+            double tetaP = (problem.getDifficulty().getSoftware() / s_T) + (team.getProblem().getDifficulty().getHardware() / h_T);
+            double I_p = (problem.getWorkingDaysLeft() - tetaP) + (problem.getExpectedCost() - (m_T * tetaP));
+            overall_I_p+= I_p;
+        }
+        return overall_I_p;
+    }
+
+    public List<Team> gettList() {
+        return tList;
+    }
+
+    public Map<String, GraphEdge> geteMap() {
+        return eMap;
+    }
+
+    public Map<String, Problem> getpMap() {
+        return pMap;
+    }
+
+    public Map<String, OfficeReply> getOrMap() {
+        return orMap;
+    }
+
+    public Map<String, OfficeCustomer> getOcMap() {
+        return ocMap;
     }
 }
