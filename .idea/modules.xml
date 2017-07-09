@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://C:\Users\Giuseppe Guarnieri\IdeaProjects\competitive-programming\reply-challenge\2017\reply-calls\InputGenerator\InputGenerator.iml" filepath="C:\Users\Giuseppe Guarnieri\IdeaProjects\competitive-programming\reply-challenge\2017\reply-calls\InputGenerator\InputGenerator.iml" />
       <module fileurl="file://$PROJECT_DIR$/OutputValidator/OutputValidator.iml" filepath="$PROJECT_DIR$/OutputValidator/OutputValidator.iml" />
       <module fileurl="file://$PROJECT_DIR$/ReplyCalls.iml" filepath="$PROJECT_DIR$/ReplyCalls.iml" />
+      <module fileurl="file://$PROJECT_DIR$/InputGenerator/input-generator.iml" filepath="$PROJECT_DIR$/InputGenerator/input-generator.iml" />
     </modules>
   </component>
 </project>
