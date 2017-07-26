@@ -6,10 +6,12 @@ package it.reply.mastercode.components.office.graph;
 public class GraphWeight {
     private Integer dailyInterruptions;
     private Integer bandwidth;
+    private Integer bandwidthForValuation;
 
     public GraphWeight(Integer dailyInterruptions, Integer bandwidth){
         this.dailyInterruptions = dailyInterruptions;
         this.bandwidth = bandwidth;
+        this.bandwidthForValuation = bandwidth;
     }
     public Integer getDailyInterruptions() {
         return dailyInterruptions;
@@ -17,5 +19,22 @@ public class GraphWeight {
 
     public Integer getBandwidth() {
         return bandwidth;
+    }
+
+    //for valuating purposes
+    public boolean decrementBandWidth(){
+        if (bandwidthForValuation > 0) {
+            bandwidthForValuation--;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isBandwidthStillAvailable(){
+        return bandwidthForValuation > 0;
+    }
+    public void restoreBandWidth(){
+        bandwidthForValuation = bandwidth;
+
     }
 }

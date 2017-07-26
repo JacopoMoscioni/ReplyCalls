@@ -41,8 +41,11 @@ public class OutputValidator {
 
     private OutputValidator() {
         Double points = new Double(Double.MAX_VALUE);
-        if (parseInputFile() && parseOutputFile())
+        if (parseInputFile() && parseOutputFile() && performValidation())
             points = performScore();
+        else{
+            points = 0.0;
+        }
         System.out.println("your score is: " + points);
     }
 
@@ -50,8 +53,8 @@ public class OutputValidator {
         int lineCounter = 0;
 
         ClassLoader classLoader = getClass().getClassLoader();
-        //List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_MAC);
-        List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_WINDOWS);
+        List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_MAC);
+        //List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_WINDOWS);
 
         //List<String> input = IOUtils.readFile( classLoader.getResource("input.txt").getFile().replace("/","\\\\").replace("\\\\C:","C:"));
 
@@ -192,8 +195,8 @@ public class OutputValidator {
     private boolean parseOutputFile() {
         int lineCounter = 0;
 
-        //List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_JACOPO_MAC);
-        List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_JACOPO_WINDOWS);
+        List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_JACOPO_MAC);
+        //List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_JACOPO_WINDOWS);
         int numeroProblemi = output.size();
         if (numeroProblemi != pMap.size()) {
             System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED NOT OK. OUTPUT PROBLEMS NUMBER DOES NOT MATCH THE INPUT PROBLEMS NUMBER");
@@ -211,11 +214,19 @@ public class OutputValidator {
                 for (int t = 0; t < teamDescriptor.length; t++) {
                     String[] employeeDescriptor = teamDescriptor[t].split(Constants.SEPARATOR_DOT);
                     if (employeeDescriptor.length == 2) {
-                        Integer ReplyOffice = Integer.parseInt(employeeDescriptor[0]) - 1;
+                        Integer replyOffice = Integer.parseInt(employeeDescriptor[0]) - 1;
                         Integer employeeNumber = Integer.parseInt(employeeDescriptor[1]) - 1;
-                        if (ReplyOffice >= 0 && employeeNumber >= 0) {
-                            OfficeReply officeReply = orMap.get(Constants.PREFIX_REPLY + ReplyOffice);
+                        if (replyOffice >= 0 && employeeNumber >= 0) {
+                            OfficeReply officeReply = orMap.get(Constants.PREFIX_REPLY + replyOffice);
+                            if (officeReply == null){
+                                System.out.println("Output validation fails. Does not exists any officeReply with index "+(replyOffice+1));
+                                return false;
+                            }
                             Employee employee = officeReply.getDipendentiMap().get(Constants.PREFIX_EMPLOYEE + employeeNumber);
+                            if (employee == null){
+                                System.out.println("Output validation fails. Does not exists any employee "+(replyOffice+1)+"."+(employeeNumber+1));
+                                return false;
+                            }
                             GraphEdge edge = eMap.get(officeReply.getName() + problem.getCustomer().getName());
                             TeamMember tm = new TeamMember(employee, officeReply, edge);
                             team.getTeamMemberList().add(tm);
@@ -236,21 +247,7 @@ public class OutputValidator {
         }
     }
 
-    /**
-     * TODO:
-     * @return
-     */
     private Double performScore(){
-        System.out.println("********************************** performScore() function needs to be implemented ****************************");
-
-        /*
-        here we can use:
-         - tList the team list
-         - eMap the employee map
-         - pMap the problem map
-         - orMap the office reply map
-         - ocMap the office customer map
-         */
         double overall_I_p = 0;
         for(Team team: tList){
             double s_T = 0;
@@ -272,6 +269,27 @@ public class OutputValidator {
             overall_I_p+= I_p;
         }
         return overall_I_p;
+    }
+
+    public boolean performValidation(){
+        boolean toRet = true;
+        int problemNumber = -1;
+        first:
+        for (Team t : tList){
+            problemNumber++;
+            for (TeamMember tm : t.getTeamMemberList()) {
+                GraphWeight weight = tm.getEdge().getWeight();
+                if(weight.decrementBandWidth()) {
+                    t.getProblem().getCustomer().getName();
+                }
+                else {
+                    toRet = false;
+                    System.out.println("The bandwidth in "+tm.getEdge().getName()+" is finished, so you cannot use "+tm.getEmployee().getName()+" at line"+(problemNumber+1)+" of your output file");
+                    break first;
+                }
+            }
+        }
+        return toRet;
     }
 
     public List<Team> gettList() {
