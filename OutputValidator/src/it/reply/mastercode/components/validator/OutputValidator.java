@@ -12,6 +12,8 @@ import it.reply.mastercode.components.office.reply.OfficeReply;
 import it.reply.mastercode.components.misc.Constants;
 import it.reply.mastercode.components.misc.IOUtils;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +37,7 @@ public class OutputValidator {
 
     public static void main(String [] args){
         System.out.println("inizio");
+        IOUtils.createLogFile();
         new OutputValidator();
         System.out.println("fine");
     }
@@ -46,7 +49,7 @@ public class OutputValidator {
         else{
             points = 0.0;
         }
-        System.out.println("your score is: " + points);
+        IOUtils.systemOut("your score is: " + points);
     }
 
     private boolean parseInputFile(){
@@ -54,7 +57,7 @@ public class OutputValidator {
 
         ClassLoader classLoader = getClass().getClassLoader();
         //List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_MAC);
-        List<String> input = IOUtils.readFile(Constants.INPUT_PATH_GENERIC_WINDOWS);
+        List<String> input = IOUtils.readFile(Constants.INPUT_PATH_GENERIC);
         if (input == null)
             return false;
 
@@ -65,7 +68,7 @@ public class OutputValidator {
             problemsNumber = Integer.parseInt(header[2]);
         }
         else {
-            System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: "+(lineCounter-1));
+            IOUtils.systemOut("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: "+(lineCounter-1));
             return false;
         }
 //READING REPLY OFFICE DESCRIPTION
@@ -83,7 +86,7 @@ public class OutputValidator {
                 or.setNumeroDipendenti(numDip);
             }
             else {
-                System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                IOUtils.systemOut("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
                 return false;
             }
             //READING EMPLOYEES
@@ -99,7 +102,7 @@ public class OutputValidator {
                         or.getDipendentiMap().put(employee.getName(),employee);
                     }
                     else{
-                        System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                        IOUtils.systemOut("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
                         return false;
                     }
                 }
@@ -108,7 +111,7 @@ public class OutputValidator {
                 //orMap.put(or.getName(),or);
             }
             else{
-                System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                IOUtils.systemOut("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
                 return false;
             }
             //FINISH EMPLOYEES
@@ -125,7 +128,7 @@ public class OutputValidator {
                 int R = Integer.parseInt(edgeDescriptor[2]) - 1;
                 int c = Integer.parseInt(edgeDescriptor[3]) - 1;
                 if (R < 0 || c < 0){
-                    System.out.println("ERROR OCCURRED. replyID or custId lower input not valid. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                    IOUtils.systemOut("ERROR OCCURRED. replyID or custId lower input not valid. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
                     return false;
                 }
                 GraphWeight gw = new GraphWeight(w1, w2);
@@ -154,7 +157,7 @@ public class OutputValidator {
                 eMap.put(edge.getName(),edge);
             }
             else {
-                System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                IOUtils.systemOut("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
                 return false;
             }
         }
@@ -180,7 +183,7 @@ public class OutputValidator {
                 pMap.put(problem.getName(),problem);
             }
             else{
-                System.out.println("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                IOUtils.systemOut("ERROR OCCURRED. INPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
                 return false;
             }
         }
@@ -193,19 +196,19 @@ public class OutputValidator {
 
     private boolean parseOutputFile() {
         int lineCounter = 0;
-        List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_GENERIC_WINDOWS);
+        List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_GENERIC);
         if (output == null)
             return false;
         int numeroProblemi = output.size();
         if (numeroProblemi != pMap.size()) {
-            System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED NOT OK. OUTPUT PROBLEMS NUMBER DOES NOT MATCH THE INPUT PROBLEMS NUMBER");
+            IOUtils.systemOut("ERROR OCCURRED. OUTPUT FILE CORRUPTED NOT OK. OUTPUT PROBLEMS NUMBER DOES NOT MATCH THE INPUT PROBLEMS NUMBER");
             return false;
         } else {
             for (int p = 0; p < numeroProblemi; p++) {
                 String[] teamDescriptor = output.get(lineCounter++).split(Constants.SEPARATOR_SPACE);
                 Problem problem = pMap.get(Constants.PREFIX_PROBLEM + p);
                 if (problem == null) {
-                    System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED NOT OK.PROBLEM INDEX IS NOT VALID");
+                    IOUtils.systemOut("ERROR OCCURRED. OUTPUT FILE CORRUPTED NOT OK.PROBLEM INDEX IS NOT VALID");
                     return false;
                 }
 
@@ -218,12 +221,12 @@ public class OutputValidator {
                         if (replyOffice >= 0 && employeeNumber >= 0) {
                             OfficeReply officeReply = orMap.get(Constants.PREFIX_REPLY + replyOffice);
                             if (officeReply == null){
-                                System.out.println("Output validation fails. Does not exists any officeReply with index "+(replyOffice+1));
+                                IOUtils.systemOut("Output validation fails. Does not exists any officeReply with index "+(replyOffice+1));
                                 return false;
                             }
                             Employee employee = officeReply.getDipendentiMap().get(Constants.PREFIX_EMPLOYEE + employeeNumber);
                             if (employee == null){
-                                System.out.println("Output validation fails. Does not exists any employee "+(replyOffice+1)+"."+(employeeNumber+1));
+                                IOUtils.systemOut("Output validation fails. Does not exists any employee "+(replyOffice+1)+"."+(employeeNumber+1));
                                 return false;
                             }
                             GraphEdge edge = eMap.get(officeReply.getName() + problem.getCustomer().getName());
@@ -231,11 +234,11 @@ public class OutputValidator {
                             team.getTeamMemberList().add(tm);
                             team.setName(Constants.PREFIX_TEAM + t);
                         } else {
-                            System.out.println("ERROR OCCURRED. reply offices and/or employee number cannot be 0");
+                            IOUtils.systemOut("ERROR OCCURRED. reply offices and/or employee number cannot be 0");
                             return false;
                         }
                     } else {
-                        System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
+                        IOUtils.systemOut("ERROR OCCURRED. OUTPUT FILE CORRUPTED ON LINE: " + (lineCounter - 1));
                         return false;
                     }
                 }
@@ -283,13 +286,14 @@ public class OutputValidator {
                 }
                 else {
                     toRet = false;
-                    System.out.println("The bandwidth in "+tm.getEdge().getName()+" is finished, so you cannot use "+tm.getEmployee().getName()+" at line"+(problemNumber+1)+" of your output file");
+                    IOUtils.systemOut("The bandwidth in "+tm.getEdge().getName()+" is finished, so you cannot use "+tm.getEmployee().getName()+" at line"+(problemNumber+1)+" of your output file");
                     break first;
                 }
             }
         }
         return toRet;
     }
+
 
     public List<Team> gettList() {
         return tList;
