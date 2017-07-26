@@ -53,11 +53,10 @@ public class OutputValidator {
         int lineCounter = 0;
 
         ClassLoader classLoader = getClass().getClassLoader();
-        List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_MAC);
-        //List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_WINDOWS);
-
-        //List<String> input = IOUtils.readFile( classLoader.getResource("input.txt").getFile().replace("/","\\\\").replace("\\\\C:","C:"));
-
+        //List<String> input = IOUtils.readFile(Constants.INPUT_PATH_JACOPO_MAC);
+        List<String> input = IOUtils.readFile(Constants.INPUT_PATH_GENERIC_WINDOWS);
+        if (input == null)
+            return false;
 
         String [] header = input.get(lineCounter++).split(Constants.SEPARATOR_SPACE);
         if (header.length == 3) {
@@ -194,9 +193,9 @@ public class OutputValidator {
 
     private boolean parseOutputFile() {
         int lineCounter = 0;
-
-        List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_JACOPO_MAC);
-        //List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_JACOPO_WINDOWS);
+        List<String> output = IOUtils.readFile(Constants.OUTPUT_PATH_GENERIC_WINDOWS);
+        if (output == null)
+            return false;
         int numeroProblemi = output.size();
         if (numeroProblemi != pMap.size()) {
             System.out.println("ERROR OCCURRED. OUTPUT FILE CORRUPTED NOT OK. OUTPUT PROBLEMS NUMBER DOES NOT MATCH THE INPUT PROBLEMS NUMBER");

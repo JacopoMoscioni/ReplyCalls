@@ -17,7 +17,8 @@ public class IOUtils {
         try(Stream<String> stream = Files.lines(Paths.get(filename))) {
             lines = stream.collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("error reading file "+filename);
+            lines = null;
         }
         return lines;
     }
